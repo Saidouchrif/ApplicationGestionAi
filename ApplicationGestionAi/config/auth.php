@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'adherent',
+        'passwords' => 'adherents',
     ],
 
     /*
@@ -38,7 +38,11 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'adherents',
+        ],
+        'adherent' => [
+            'driver' => 'session',
+            'provider' => 'adherents',
         ],
     ],
 
@@ -62,7 +66,11 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Adherent::class,
+        ],
+        'adherents' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Adherent::class,
         ],
 
         // 'users' => [
