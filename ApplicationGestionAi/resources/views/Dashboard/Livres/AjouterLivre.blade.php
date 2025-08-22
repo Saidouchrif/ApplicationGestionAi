@@ -43,6 +43,16 @@
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
+            <!-- Price -->
+<div>
+    <label for="price" class="block text-sm font-medium text-gray-700">Prix (MAD)</label>
+    <input type="number" name="price" id="price" step="0.01" min="0" value="{{ old('price') }}"
+           class="mt-2 w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+           placeholder="Ex: 150.00">
+    @error('price')
+        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+</div>
 
             <!-- Stock -->
             <div>

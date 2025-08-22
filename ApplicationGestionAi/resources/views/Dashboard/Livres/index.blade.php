@@ -61,6 +61,7 @@
                             <th class="px-4 py-3">Description</th>
                             <th class="px-4 py-3">Image</th>
                             <th class="px-4 py-3">Stock</th>
+                            <th class="px-4 py-3">Prix</th> <!-- جديد -->
                             <th class="px-4 py-3">Rating</th>
                             <th class="px-4 py-3 text-center">Actions</th>
                         </tr>
@@ -85,6 +86,9 @@
                                         <span class="text-red-600 font-medium">Épuisé</span>
                                     @endif
                                 </td>
+                                <td class="px-4 py-3"> <!-- جديد -->
+                                    {{ number_format($livre->price, 2, ',', ' ') }} MAD
+                                </td>
                                 <td class="px-4 py-3">
                                     ⭐ {{ $livre->rating }}/5
                                 </td>
@@ -105,6 +109,7 @@
                             </tr>
                         @endforeach
                     </tbody>
+                    
                 </table>
             </div>
 

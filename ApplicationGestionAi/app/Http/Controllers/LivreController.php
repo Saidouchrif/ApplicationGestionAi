@@ -45,6 +45,7 @@ class LivreController extends Controller
             'image_url' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'stock' => 'required|integer|min:0',
             'rating' => 'nullable|numeric|min:0|max:5',
+            'price'=>'required|numeric',
         ]);
         $validatedData['image_url']=$request->file('image_url')->store('livres','public');
         Livre::create($validatedData);
@@ -102,6 +103,7 @@ class LivreController extends Controller
             'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'stock' => 'required|integer|min:0',
             'rating' => 'nullable|numeric|min:0|max:5',
+            'price'=>'required|numeric',
         ]);
         if($request->hasFile('image_url')){
         $validatedData['image_url']=$request->file('image_url')->store('livres','public');

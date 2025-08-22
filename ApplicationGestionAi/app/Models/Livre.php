@@ -16,6 +16,7 @@ class Livre extends Model
         'image_url',
         'stock',
         'rating',
+        'price',
     ];
     public function emprunts()
     {
