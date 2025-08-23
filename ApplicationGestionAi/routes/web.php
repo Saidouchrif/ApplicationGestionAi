@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpruntController;
 use App\Http\Controllers\LivreController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ReservationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -91,9 +92,9 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin')
         ->name('dashboard');
 });
-Route::get('/emprunts/create/{id_livre}', [EmpruntController::class, 'create'])->name('emprunts.create');
-Route::post('/emprunts/store', [EmpruntController::class, 'store'])->name('emprunts.store');
-Route::get('/emprunts', [EmpruntController::class, 'index'])->name('emprunts.index');
+Route::get('/emprunts/create/{id_livre}', [EmpruntController::class, 'create'])->name('emprunts.create')->middleware('auth');
+Route::post('/emprunts/store', [EmpruntController::class, 'store'])->name('emprunts.store')->middleware('auth');
+Route::get('/emprunts', [EmpruntController::class, 'index'])->name('emprunts.index')->middleware('auth');
 Route::get('/adherents/create', [AdherentController::class, 'create'])->name('adherents.create');
 Route::post('/adherents/store', [AdherentController::class, 'store'])->name('adherents.store');
 Route::get('/adherent/index',[DashboardController::class,'adherentindex'])->name('adherentindex');
@@ -106,3 +107,5 @@ Route::post('/books/store', [LivreController::class, 'store'])->name('livres.sto
 Route::get('/Books/edit/{id}', [LivreController::class, 'edit'])->name('livres.edit');
 Route::put('/Books/update/{id}', [LivreController::class, 'update'])->name('livres.update');
 Route::delete('/Books/delete/{id}', [LivreController::class, 'destroy'])->name('livres.destroy');
+Route::get('/reservation/create/{id_livre}',[ReservationController::class,'create'])->name('reservation.create');
+Route::post('/reservation/store',[ReservationController::class,'store'])->name('reservation.store');

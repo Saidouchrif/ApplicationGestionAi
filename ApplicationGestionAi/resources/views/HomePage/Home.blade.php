@@ -202,14 +202,6 @@
                 <p class="mt-6 max-w-2xl mx-auto text-xl text-blue-100">
                     Explorez des milliers de livres dans tous les genres. Empruntez, lisez et partagez votre passion pour la lecture.
                 </p>
-                <div class="mt-10">
-                    <div class="relative max-w-lg mx-auto">
-                        <input type="text" placeholder="Rechercher un livre..." class="w-full px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        <button class="absolute right-2 top-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-md transition-colors duration-200">
-                            Rechercher
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -222,230 +214,76 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Book Card 1 -->
+            @foreach($livres as $livre)
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Livre 1" class="w-full h-64 object-cover">
-                    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        ⭐ 4.8
-                    </div>
+                    @if($livre->image_url)
+                        @if(filter_var($livre->image_url, FILTER_VALIDATE_URL))
+                            <!-- Image externe (URL) -->
+                            <img src="{{ $livre->image_url }}" 
+                                 alt="{{ $livre->titre }}" 
+                                 class="w-full h-56 object-cover">
+                        @else
+                            <!-- Image uploadée localement -->
+                            <img src="{{ asset('storage/'.$livre->image_url) }}" 
+                                 alt="{{ $livre->titre }}" 
+                                 class="w-full h-56 object-cover">
+                        @endif
+                    @else
+                        <!-- Image par défaut -->
+                        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=698&q=80" 
+                             alt="Image par défaut" 
+                             class="w-full h-56 object-cover">
+                    @endif
+                    
+                    <!-- Rating (en haut à droite) -->
+                    @if(!is_null($livre->rating))
+                        <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
+                            ⭐ {{ number_format((float)$livre->rating, 1) }}
+                        </div>
+                    @endif
+                    
+                    <!-- Prix (en bas à gauche) -->
+                    @if(!is_null($livre->price) && $livre->price > 0)
+                        <div class="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                            💰 {{ number_format((float)$livre->price, 2) }} (MAD)
+                        </div>
+                    @elseif(!is_null($livre->price) && $livre->price == 0)
+                        <div class="absolute bottom-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                            🆓 Gratuit
+                        </div>
+                    @endif
                 </div>
                 <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Le Petit Prince</h3>
-                    <p class="text-sm text-gray-600 mb-3">Antoine de Saint-Exupéry</p>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-                        Un conte poétique et philosophique qui aborde les thèmes de l'amour, de l'amitié et du sens de la vie.
-                    </p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-green-600 text-sm font-medium">Disponible</span>
-                        <div class="flex space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Détails
-                            </button>
-                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Emprunter
-                            </button>
-                        </div>
-                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">{{ $livre->titre }}</h3>
+                    <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $livre->description }}</p>
+                                                <div class="flex justify-between items-center">
+                                @php $disponible = (int)($livre->stock ?? 0) > 0; @endphp
+                                <span class="{{ $disponible ? 'text-green-600' : 'text-orange-600' }} text-sm font-medium">
+                                    {{ $disponible ? 'Disponible' : 'Stock épuisé' }}
+                                </span>
+                                <div class="flex space-x-2">
+                                    <a href="{{ route('livres.show', $livre->id_livre) }}" 
+                                       class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                        Détails
+                                    </a>
+                                    @if($disponible)
+                                        <a href="{{ route('emprunts.create', $livre->id_livre) }}" 
+                                           class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                            Emprunter
+                                        </a>
+                                    @else
+                                        <button class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                            Réserver
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
                 </div>
             </div>
-
-            <!-- Book Card 2 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=698&q=80" alt="Livre 2" class="w-full h-64 object-cover">
-                    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        ⭐ 4.6
-                    </div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">1984</h3>
-                    <p class="text-sm text-gray-600 mb-3">George Orwell</p>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-                        Une dystopie visionnaire qui dépeint une société totalitaire sous surveillance constante.
-                    </p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-green-600 text-sm font-medium">Disponible</span>
-                        <div class="flex space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Détails
-                            </button>
-                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Emprunter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Book Card 3 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Livre 3" class="w-full h-64 object-cover">
-                    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        ⭐ 4.9
-                    </div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Harry Potter</h3>
-                    <p class="text-sm text-gray-600 mb-3">J.K. Rowling</p>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-                        L'histoire épique d'un jeune sorcier découvrant un monde magique et combattant le mal.
-                    </p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-red-600 text-sm font-medium">Emprunté</span>
-                        <div class="flex space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Détails
-                            </button>
-                            <button class="bg-gray-400 text-gray-600 px-3 py-1 rounded text-sm cursor-not-allowed" disabled>
-                                Emprunter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Book Card 4 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Livre 4" class="w-full h-64 object-cover">
-                    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        ⭐ 4.7
-                    </div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Le Seigneur des Anneaux</h3>
-                    <p class="text-sm text-gray-600 mb-3">J.R.R. Tolkien</p>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-                        Une épopée fantastique dans un monde médiéval où le destin de la Terre du Milieu est en jeu.
-                    </p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-green-600 text-sm font-medium">Disponible</span>
-                        <div class="flex space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Détails
-                            </button>
-                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Emprunter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Book Card 5 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Livre 5" class="w-full h-64 object-cover">
-                    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        ⭐ 4.5
-                    </div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Don Quichotte</h3>
-                    <p class="text-sm text-gray-600 mb-3">Miguel de Cervantes</p>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-                        L'histoire d'un gentilhomme qui perd la raison en lisant trop de romans de chevalerie.
-                    </p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-green-600 text-sm font-medium">Disponible</span>
-                        <div class="flex space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Détails
-                            </button>
-                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Emprunter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Book Card 6 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Livre 6" class="w-full h-64 object-cover">
-                    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        ⭐ 4.4
-                    </div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Madame Bovary</h3>
-                    <p class="text-sm text-gray-600 mb-3">Gustave Flaubert</p>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-                        Le portrait d'une femme bourgeoise insatisfaite de sa vie et cherchant l'évasion dans l'amour.
-                    </p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-green-600 text-sm font-medium">Disponible</span>
-                        <div class="flex space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Détails
-                            </button>
-                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Emprunter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Book Card 7 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Livre 7" class="w-full h-64 object-cover">
-                    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        ⭐ 4.3
-                    </div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">L'Étranger</h3>
-                    <p class="text-sm text-gray-600 mb-3">Albert Camus</p>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-                        L'histoire d'un homme confronté à l'absurdité de l'existence après la mort de sa mère.
-                    </p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-green-600 text-sm font-medium">Disponible</span>
-                        <div class="flex space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Détails
-                            </button>
-                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Emprunter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Book Card 8 -->
-            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Livre 8" class="w-full h-64 object-cover">
-                    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        ⭐ 4.6
-                    </div>
-                </div>
-                <div class="p-4">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Les Misérables</h3>
-                    <p class="text-sm text-gray-600 mb-3">Victor Hugo</p>
-                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">
-                        Une fresque sociale sur la misère et la rédemption dans le Paris du XIXe siècle.
-                    </p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-green-600 text-sm font-medium">Disponible</span>
-                        <div class="flex space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Détails
-                            </button>
-                            <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
-                                Emprunter
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endforeach
         </div>
+        
 
         <!-- Load More Button -->
         <div class="text-center mt-12">

@@ -23,10 +23,36 @@
 
         <!-- Colonne image -->
         <div class="flex justify-center">
-            <div class="bg-white rounded-xl shadow-xl overflow-hidden transform hover:scale-105 transition duration-300">
-                <img src="{{ $livre->image_url ? asset('storage/'.$livre->image_url) : 'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=800&q=80' }}"
-                     alt="{{ $livre->titre }}"
-                     class="w-full h-[450px] object-cover">
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden transform hover:scale-105 transition duration-300 relative">
+                @if($livre->image_url)
+                    @if(filter_var($livre->image_url, FILTER_VALIDATE_URL))
+                        <!-- Image externe (URL) -->
+                        <img src="{{ $livre->image_url }}" 
+                             alt="{{ $livre->titre }}"
+                             class="w-full h-[450px] object-cover">
+                    @else
+                        <!-- Image uploadée localement -->
+                        <img src="{{ asset('storage/'.$livre->image_url) }}" 
+                             alt="{{ $livre->titre }}"
+                             class="w-full h-[450px] object-cover">
+                    @endif
+                @else
+                    <!-- Image par défaut -->
+                    <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=698&q=80" 
+                         alt="Image par défaut"
+                         class="w-full h-[450px] object-cover">
+                @endif
+                
+                <!-- Prix sur l'image -->
+                @if(!is_null($livre->price) && $livre->price > 0)
+                    <div class="absolute bottom-4 left-4 bg-green-500 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-lg">
+                        💰 {{ number_format((float)$livre->price, 2) }} (MAD)
+                    </div>
+                @elseif(!is_null($livre->price) && $livre->price == 0)
+                    <div class="absolute bottom-4 left-4 bg-blue-500 text-white px-3 py-2 rounded-lg text-sm font-semibold shadow-lg">
+                        🆓 Gratuit
+                    </div>
+                @endif
             </div>
         </div>
         
@@ -57,8 +83,21 @@
                     <p class="text-yellow-500 font-semibold">
                         @if($livre->rating)
                             ⭐ {{ number_format((float)$livre->rating, 1) }}/5
+                        </p>
+                    @else
+                        Non noté
+                    </p>
+                @endif
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
+                    <span class="text-sm font-semibold text-gray-500">Prix</span>
+                    <p class="font-semibold">
+                        @if(!is_null($livre->price) && $livre->price > 0)
+                            <span class="text-green-600">💰 {{ number_format((float)$livre->price, 2) }} (MAD)</span>
+                        @elseif(!is_null($livre->price) && $livre->price == 0)
+                            <span class="text-blue-600">🆓 Gratuit</span>
                         @else
-                            Non noté
+                            <span class="text-gray-500">Non spécifié</span>
                         @endif
                     </p>
                 </div>
@@ -71,13 +110,10 @@
             <!-- Actions -->
             <div class="mt-10 flex flex-wrap gap-4">
                 @if($disponible)
-                    <form action="#" method="POST">
-                        @csrf
-                        <button type="submit"
-                            class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105">
-                            📚 Emprunter ce livre
-                        </button>
-                    </form>
+                <a href="{{ route('emprunts.create', $livre->id_livre) }}"
+                    class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105 inline-block">
+                    📚 Emprunter ce livre
+                 </a>
                 @else
                     <button disabled
                         class="px-6 py-3 bg-gray-400 text-gray-100 font-semibold rounded-xl shadow-md cursor-not-allowed">
@@ -100,9 +136,37 @@
             @foreach($similaires ?? [] as $similar)
                 <a href="{{ route('livres.show', $similar->id_livre) }}"
                    class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transform hover:scale-105 transition duration-300">
-                   <img src="{{ $similar->image_url ? asset('storage/'.$similar->image_url) : 'https://images.unsplash.com/photo-1512820790803-83ca734da794' }}"
-                   alt="{{ $similar->titre }}"
-                   class="w-full h-56 object-cover">
+                   <div class="relative">
+                       @if($similar->image_url)
+                           @if(filter_var($similar->image_url, FILTER_VALIDATE_URL))
+                               <!-- Image externe (URL) -->
+                               <img src="{{ $similar->image_url }}" 
+                                    alt="{{ $similar->titre }}"
+                                    class="w-full h-56 object-cover">
+                           @else
+                               <!-- Image uploadée localement -->
+                               <img src="{{ asset('storage/'.$similar->image_url) }}" 
+                                    alt="{{ $similar->titre }}"
+                                    class="w-full h-56 object-cover">
+                           @endif
+                       @else
+                           <!-- Image par défaut -->
+                           <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=698&q=80" 
+                                alt="Image par défaut"
+                                class="w-full h-56 object-cover">
+                       @endif
+                       
+                       <!-- Prix sur l'image -->
+                       @if(!is_null($similar->price) && $similar->price > 0)
+                           <div class="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                               💰 {{ number_format((float)$similar->price, 2) }} (MAD)
+                           </div>
+                       @elseif(!is_null($similar->price) && $similar->price == 0)
+                           <div class="absolute bottom-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                               🆓 Gratuit
+                           </div>
+                       @endif
+                   </div>
                     <div class="p-4">
                         <h4 class="text-lg font-semibold text-gray-900 truncate">{{ $similar->titre }}</h4>
                         <p class="text-sm text-gray-600">{{ $similar->auteur ?? 'Auteur inconnu' }}</p>

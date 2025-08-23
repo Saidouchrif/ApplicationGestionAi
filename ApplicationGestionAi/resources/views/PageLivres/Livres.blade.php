@@ -225,10 +225,40 @@
                 @foreach($livres as $livre)
                     <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                         <div class="relative">
-                            <img src="{{ $livre->image_url ?: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=698&q=80' }}" alt="{{ $livre->titre }}" class="w-full h-56 object-cover">
+                            @if($livre->image_url)
+                                @if(filter_var($livre->image_url, FILTER_VALIDATE_URL))
+                                    <!-- Image externe (URL) -->
+                                    <img src="{{ $livre->image_url }}" 
+                                         alt="{{ $livre->titre }}" 
+                                         class="w-full h-56 object-cover">
+                                @else
+                                    <!-- Image uploadée localement -->
+                                    <img src="{{ asset('storage/'.$livre->image_url) }}" 
+                                         alt="{{ $livre->titre }}" 
+                                         class="w-full h-56 object-cover">
+                                @endif
+                            @else
+                                <!-- Image par défaut -->
+                                <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=698&q=80" 
+                                     alt="Image par défaut" 
+                                     class="w-full h-56 object-cover">
+                            @endif
+                            
+                            <!-- Rating (en haut à droite) -->
                             @if(!is_null($livre->rating))
                                 <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
                                     ⭐ {{ number_format((float)$livre->rating, 1) }}
+                                </div>
+                            @endif
+                            
+                            <!-- Prix (en bas à gauche) -->
+                            @if(!is_null($livre->price) && $livre->price > 0)
+                                <div class="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                                    💰 {{ number_format((float)$livre->price, 2) }} (MAD)
+                                </div>
+                            @elseif(!is_null($livre->price) && $livre->price == 0)
+                                <div class="absolute bottom-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                                    🆓 Gratuit
                                 </div>
                             @endif
                         </div>
@@ -237,8 +267,8 @@
                             <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ $livre->description }}</p>
                             <div class="flex justify-between items-center">
                                 @php $disponible = (int)($livre->stock ?? 0) > 0; @endphp
-                                <span class="{{ $disponible ? 'text-green-600' : 'text-red-600' }} text-sm font-medium">
-                                    {{ $disponible ? 'Disponible' : 'Emprunté' }}
+                                <span class="{{ $disponible ? 'text-green-600' : 'text-orange-600' }} text-sm font-medium">
+                                    {{ $disponible ? 'Disponible' : 'Stock épuisé' }}
                                 </span>
                                 <div class="flex space-x-2">
                                     <a href="{{ route('livres.show',$livre->id_livre) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors duration-200">Détails</a>
@@ -248,7 +278,9 @@
                                             Emprunter
                                         </a>
                                     @else
-                                        <button class="bg-gray-400 text-gray-700 px-3 py-1 rounded text-sm cursor-not-allowed" disabled>Indisponible</button>
+                                        <button class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm transition-colors duration-200">
+                                            Réserver
+                                        </button>
                                     @endif
                                 </div>
                             </div>

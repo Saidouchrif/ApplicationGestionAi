@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Models\Livre;
+use App\Models\Adherent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
@@ -12,15 +15,39 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        //
+        // Vérifier que l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour voir vos réservations.');
+        }
+
+        // Récupérer les réservations de l'utilisateur connecté
+        $reservations = Reservation::where('id_adherent', Auth::id())
+            ->with(['livre', 'adherent'])
+            ->orderBy('date_reservation', 'desc')
+            ->get();
+
+        return view('reservations.index', compact('reservations'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request, $id_livre)
     {
-        //
+        // Vérifier que l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour effectuer une réservation.');
+        }
+
+        // Si un ID de livre est fourni, récupérer le livre
+        if ($id_livre) {
+            $livre = Livre::findOrFail($id_livre);
+            return view('reservations.create', compact('livre'));
+        }
+
+        // Sinon, afficher la liste des livres disponibles pour réservation
+        $livres = Livre::where('stock', 0)->get();
+        return view('reservations.create', compact('livres'));
     }
 
     /**
@@ -28,7 +55,47 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validation des données
+        $request->validate([
+            'id_livre' => 'required|exists:livres,id_livre',
+            'date_reservation' => 'required|date|after_or_equal:today',
+        ], [
+            'id_livre.required' => 'Le livre est requis.',
+            'id_livre.exists' => 'Le livre n\'existe pas.',
+            'date_reservation.required' => 'La date de réservation est requise.',
+            'date_reservation.after_or_equal' => 'La date de réservation doit être aujourd\'hui ou dans le futur.',
+        ]);
+
+        // Vérifier que l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour effectuer une réservation.');
+        }
+
+        // Vérifier que le livre existe
+        $livre = Livre::find($request->id_livre);
+        if (!$livre) {
+            return redirect()->back()->with('error', 'Livre non trouvé.');
+        }
+
+        // Vérifier que l'utilisateur n'a pas déjà une réservation pour ce livre
+        $existingReservation = Reservation::where('id_adherent', Auth::id())
+            ->where('id_livre', $request->id_livre)
+            ->where('status', 'en_attente')
+            ->first();
+
+        if ($existingReservation) {
+            return redirect()->back()->with('error', 'Vous avez déjà une réservation en attente pour ce livre.');
+        }
+
+        // Créer la réservation
+        $reservation = Reservation::create([
+            'id_adherent' => Auth::id(),
+            'id_livre' => $request->id_livre,
+            'date_reservation' => $request->date_reservation,
+            'status' => 'en_attente',
+        ]);
+
+        return redirect()->back()->with('success', 'Réservation créée avec succès ! Vous serez notifié quand le livre sera disponible.');
     }
 
     /**
@@ -52,7 +119,30 @@ class ReservationController extends Controller
      */
     public function update(Request $request, Reservation $reservation)
     {
-        //
+        // Validation des données
+        $request->validate([
+            'status' => 'required|in:en_attente,confirmee,annulee',
+        ], [
+            'status.required' => 'Le statut est requis.',
+            'status.in' => 'Le statut doit être en_attente, confirmee ou annulee.',
+        ]);
+
+        // Vérifier que l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->back()->with('error', 'Vous devez être connecté pour modifier une réservation.');
+        }
+
+        // Vérifier que l'utilisateur peut modifier cette réservation (propriétaire ou admin)
+        if ($reservation->id_adherent !== Auth::id() && Auth::user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé à modifier cette réservation.');
+        }
+
+        // Mettre à jour la réservation
+        $reservation->update([
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Statut de la réservation mis à jour avec succès.');
     }
 
     /**
@@ -60,6 +150,19 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $reservation)
     {
-        //
+        // Vérifier que l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->back()->with('error', 'Vous devez être connecté pour annuler une réservation.');
+        }
+
+        // Vérifier que l'utilisateur peut annuler cette réservation (propriétaire ou admin)
+        if ($reservation->id_adherent !== Auth::id() && Auth::user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé à annuler cette réservation.');
+        }
+
+        // Supprimer la réservation
+        $reservation->delete();
+
+        return redirect()->back()->with('success', 'Réservation annulée avec succès.');
     }
 }

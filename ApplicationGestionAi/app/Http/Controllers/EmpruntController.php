@@ -34,7 +34,7 @@ class EmpruntController extends Controller
     public function store(Request $request)
     {
         // Validation des données
-        $emprunt=$request->validate([
+        $emprunt = $request->validate([
             'id_livre' => 'required|exists:livres,id_livre',
             'id_adherent' => 'required|exists:adherents,id_adherent',
             'date_emprunt' => 'required|date',
@@ -48,8 +48,24 @@ class EmpruntController extends Controller
             'id_adherent.exists' => 'L\'adherent n\'existe pas.',
             'date_emprunt.required' => 'La date d\'emprunt est requise.',
         ]);
+
+        // Vérifier que le livre est disponible
+        $livre = Livre::find($request->id_livre);
+        if (!$livre) {
+            return redirect()->back()->with('error', 'Livre non trouvé.');
+        }
+
+        if ($livre->stock <= 0) {
+            return redirect()->back()->with('error', 'Ce livre n\'est plus disponible en stock.');
+        }
+
+        // Créer l'emprunt
         Emprunt::create($emprunt);
-        return redirect()->route('livres.index')->with('success', 'Emprunt créé avec succès.');
+
+        // Décrémenter le stock du livre
+        $livre->decrement('stock');
+
+        return redirect()->route('livres.index')->with('success', 'Emprunt créé avec succès. Le stock du livre a été mis à jour.');
     }
 
     /**
@@ -73,7 +89,24 @@ class EmpruntController extends Controller
      */
     public function update(Request $request, Emprunt $emprunt)
     {
-        //
+        // Validation des données
+        $request->validate([
+            'statut' => 'required|in:en_cours,retourne',
+            'date_retour_effectif' => 'required_if:statut,retourne|date|after_or_equal:date_emprunt',
+        ]);
+
+        // Si le statut passe à "retourné", incrémenter le stock du livre
+        if ($request->statut === 'retourne' && $emprunt->statut === 'en_cours') {
+            $livre = Livre::find($emprunt->id_livre);
+            if ($livre) {
+                $livre->increment('stock');
+            }
+        }
+
+        // Mettre à jour l'emprunt
+        $emprunt->update($request->all());
+
+        return redirect()->back()->with('success', 'Emprunt mis à jour avec succès.');
     }
 
     /**
@@ -81,6 +114,17 @@ class EmpruntController extends Controller
      */
     public function destroy(Emprunt $emprunt)
     {
-        //
+        // Si l'emprunt est en cours, remettre le livre en stock
+        if ($emprunt->statut === 'en_cours') {
+            $livre = Livre::find($emprunt->id_livre);
+            if ($livre) {
+                $livre->increment('stock');
+            }
+        }
+
+        // Supprimer l'emprunt
+        $emprunt->delete();
+
+        return redirect()->back()->with('success', 'Emprunt supprimé avec succès.');
     }
 }

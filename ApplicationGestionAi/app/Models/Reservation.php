@@ -20,4 +20,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(Adherent::class, 'id_adherent');
     }
+
+    public function livre()
+    {
+        return $this->belongsTo(Livre::class, 'id_livre');
+    }
 }
