@@ -20,11 +20,18 @@ class ReservationController extends Controller
             return redirect()->route('login')->with('error', 'Vous devez être connecté pour voir vos réservations.');
         }
 
-        // Récupérer les réservations de l'utilisateur connecté avec pagination
-        $reservations = Reservation::where('id_adherent', Auth::id())
-            ->with(['livre', 'adherent'])
-            ->orderBy('date_reservation', 'desc')
-            ->paginate(10);
+        // Si c'est un admin, récupérer toutes les réservations
+        if (Auth::user()->role === 'admin') {
+            $reservations = Reservation::with(['livre', 'adherent'])
+                ->orderBy('date_reservation', 'desc')
+                ->paginate(10);
+        } else {
+            // Sinon, récupérer seulement les réservations de l'utilisateur connecté
+            $reservations = Reservation::where('id_adherent', Auth::id())
+                ->with(['livre', 'adherent'])
+                ->orderBy('date_reservation', 'desc')
+                ->paginate(10);
+        }
 
         return view('ReservationPage.index', compact('reservations'));
     }
@@ -180,18 +187,26 @@ class ReservationController extends Controller
             return redirect()->back()->with('error', 'Vous devez être connecté pour modifier une réservation.');
         }
 
-        // Trouver la réservation pour ce livre et cet utilisateur
-        $reservation = Reservation::where('id_livre', $id_livre)
-            ->where('id_adherent', Auth::id())
-            ->first();
+        // Si c'est un admin, il peut modifier n'importe quelle réservation pour ce livre
+        if (Auth::user()->role === 'admin') {
+            // Pour les admins, on peut avoir plusieurs réservations pour le même livre
+            // On prend la première réservation en attente ou confirmée
+            $reservation = Reservation::where('id_livre', $id_livre)
+                ->whereIn('status', ['en_attente', 'confirmee'])
+                ->first();
+                
+            if (!$reservation) {
+                return redirect()->back()->with('error', 'Aucune réservation active trouvée pour ce livre.');
+            }
+        } else {
+            // Pour les adhérents, ils ne peuvent modifier que leurs propres réservations
+            $reservation = Reservation::where('id_livre', $id_livre)
+                ->where('id_adherent', Auth::id())
+                ->first();
 
-        if (!$reservation) {
-            return redirect()->back()->with('error', 'Réservation non trouvée.');
-        }
-
-        // Vérifier que l'utilisateur peut modifier cette réservation (propriétaire ou admin)
-        if ($reservation->id_adherent !== Auth::id() && Auth::user()->role !== 'admin') {
-            return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé à modifier cette réservation.');
+            if (!$reservation) {
+                return redirect()->back()->with('error', 'Réservation non trouvée.');
+            }
         }
 
         // Mettre à jour la réservation

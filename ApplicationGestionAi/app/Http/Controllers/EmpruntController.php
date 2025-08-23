@@ -14,8 +14,23 @@ class EmpruntController extends Controller
      */
     public function index()
     {
-        $adherents=Auth::id();
-        $emprunts=Emprunt::where('id_adherent',$adherents)->get();
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Vous devez être connecté pour voir vos emprunts.');
+        }
+
+        if (Auth::user()->role === 'admin') {
+            // Les admins voient tous les emprunts
+            $emprunts = Emprunt::with(['livre', 'adherent'])
+                ->orderBy('date_emprunt', 'desc')
+                ->get();
+        } else {
+            // Les adhérents voient seulement leurs emprunts
+            $emprunts = Emprunt::where('id_adherent', Auth::id())
+                ->with(['livre', 'adherent'])
+                ->orderBy('date_emprunt', 'desc')
+                ->get();
+        }
+
         return view('EmpruntPage.index', compact('emprunts'));
     }
 
@@ -127,7 +142,45 @@ class EmpruntController extends Controller
 
         return redirect()->back()->with('success', 'Emprunt supprimé avec succès.');
     }
-    public function chnagerstatus(Request $request,$id){
-        
+    public function chnagerstatus(Request $request, $id){
+        // Validation des données
+        $request->validate([
+            'status' => 'required|in:retourne'
+        ]);
+
+        try {
+            // Récupérer l'emprunt
+            $emprunt = Emprunt::findOrFail($id);
+            
+            // Vérifier que l'utilisateur est connecté
+            if (!Auth::check()) {
+                return redirect()->back()->with('error', 'Vous devez être connecté pour effectuer cette action.');
+            }
+            
+            // Vérifier que l'utilisateur est le propriétaire de l'emprunt ou un admin
+            if (Auth::user()->role !== 'admin' && Auth::id() != $emprunt->id_adherent) {
+                return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé à modifier cet emprunt.');
+            }
+            
+            // Vérifier que l'emprunt est en cours
+            if ($emprunt->statut !== 'en_cours') {
+                return redirect()->back()->with('error', 'Seuls les emprunts en cours peuvent être marqués comme retournés.');
+            }
+            
+            // Mettre à jour le statut
+            $emprunt->statut = 'retourne';
+            $emprunt->date_retour_effectif = now();
+            $emprunt->save();
+            
+            // Incrémenter le stock du livre
+            if ($emprunt->livre) {
+                $emprunt->livre->increment('stock');
+            }
+            
+            return redirect()->back()->with('success', 'L\'emprunt a été marqué comme retourné avec succès. Le stock du livre a été mis à jour.');
+            
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Une erreur est survenue lors de la mise à jour du statut.');
+        }
     }
 }

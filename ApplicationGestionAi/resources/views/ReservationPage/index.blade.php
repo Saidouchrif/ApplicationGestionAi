@@ -76,6 +76,22 @@
                                         Gestion adherent
                                     </div>
                                 </a>
+                                <a href="{{ route('reservations.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Gestion des réservations
+                                    </div>
+                                </a>
+                                <a href="{{ route('emprunts.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Gestion des emprunts
+                                    </div>
+                                </a>
                                 @endif
                                 
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
@@ -86,6 +102,7 @@
                                         Mon Profil
                                     </div>
                                 </a>
+
                                 @if(Auth::user()->role === 'adherent')
                                 <a href="{{route('emprunts.index')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
                                     <div class="flex items-center">
@@ -200,8 +217,26 @@
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Vos réservations</h2>
-                    <p class="text-gray-600 mt-1">Consultez et gérez toutes vos réservations</p>
+                    <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                        @if(Auth::user()->role === 'admin')
+                            <svg class="w-8 h-8 text-purple-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Gestion des réservations
+                        @else
+                            <svg class="w-8 h-8 text-purple-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Vos réservations
+                        @endif
+                    </h2>
+                    <p class="text-gray-600 mt-1">
+                        @if(Auth::user()->role === 'admin')
+                            Consultez et gérez toutes les réservations de la bibliothèque
+                        @else
+                            Consultez et gérez toutes vos réservations
+                        @endif
+                    </p>
                 </div>
                 <div class="mt-4 md:mt-0">
                     <a href="{{ route('livres.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200">
@@ -254,19 +289,34 @@
                                                 @elseif($reservation->status === 'confirmee')
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                         </svg>
                                                         Confirmée
                                                     </span>
                                                 @elseif($reservation->status === 'annulee')
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293-4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293-4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                                                         </svg>
                                                         Annulée
                                                     </span>
                                                 @endif
                                             </div>
+                                            
+                                            @if(Auth::user()->role === 'admin')
+                                            <div>
+                                                <span class="text-gray-500">Adhérent :</span>
+                                                <div class="flex items-center mt-1">
+                                                    <div class="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-2">
+                                                        <svg class="w-3 h-3 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                        </svg>
+                                                    </div>
+                                                    <span class="font-medium text-gray-900">{{ $reservation->adherent->nom ?? 'Adhérent inconnu' }}</span>
+                                                    <span class="text-xs text-gray-500 ml-2">(ID: {{ $reservation->id_adherent }})</span>
+                                                </div>
+                                            </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -286,156 +336,280 @@
                                          <!-- Actions pour les admins -->
                                          @if($reservation->status === 'en_attente')
                                              <!-- Bouton Accepter -->
-                                             <form action="{{ route('reservations.update', $reservation->id_reservation) }}" method="POST" class="inline">
-                                                 @csrf
-                                                 @method('PUT')
-                                                 <input type="hidden" name="status" value="confirmee">
-                                                 <button type="submit" 
-                                                         onclick="return confirm('Êtes-vous sûr de vouloir accepter cette réservation ?')"
+                                             <div x-data="{ showConfirmAccept: false }" class="inline">
+                                                 <button type="button" 
+                                                         @click="showConfirmAccept = true"
                                                          class="inline-flex items-center justify-center px-4 py-2 border border-green-300 rounded-lg text-sm font-medium text-green-700 bg-white hover:bg-green-50 transition-colors duration-200">
                                                      <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                      </svg>
                                                      Accepter
                                                  </button>
-                                             </form>
+                                                 
+                                                 <!-- Modal de confirmation pour accepter -->
+                                                 <div x-show="showConfirmAccept" 
+                                                      x-transition:enter="transition ease-out duration-300"
+                                                      x-transition:enter-start="opacity-0"
+                                                      x-transition:enter-end="opacity-100"
+                                                      x-transition:leave="transition ease-in duration-200"
+                                                      x-transition:leave-start="opacity-100"
+                                                      x-transition:leave-end="opacity-0"
+                                                      class="fixed inset-0 z-50 overflow-y-auto" 
+                                                      style="display: none;">
+                                                     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                                         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showConfirmAccept = false"></div>
+                                                         
+                                                         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                                 <div class="sm:flex sm:items-start">
+                                                                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                                         <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                         </svg>
+                                                                     </div>
+                                                                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                                                         <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                                             Confirmer l'acceptation
+                                                                         </h3>
+                                                                         <div class="mt-2">
+                                                                             <p class="text-sm text-gray-500">
+                                                                                 Êtes-vous sûr de vouloir accepter cette réservation ? 
+                                                                                 Le livre sera réservé pour cet adhérent.
+                                                                             </p>
+                                                                         </div>
+                                                                     </div>
+                                                                 </div>
+                                                             </div>
+                                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                                 <form action="{{ route('reservations.status', $reservation->livre->id_livre) }}" method="POST" class="inline">
+                                                                     @csrf
+                                                                     @method('PUT')
+                                                                     <input type="hidden" name="status" value="confirmee">
+                                                                     <button type="submit" 
+                                                                             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                         Confirmer
+                                                                     </button>
+                                                                 </form>
+                                                                 <button type="button" 
+                                                                         @click="showConfirmAccept = false"
+                                                                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                     Annuler
+                                                                 </button>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
                                          @endif
                                          
                                          @if($reservation->status === 'confirmee')
                                              <!-- Bouton Remettre en attente -->
-                                             <form action="{{ route('reservations.update', $reservation->id_reservation) }}" method="POST" class="inline">
-                                                 @csrf
-                                                 @method('PUT')
-                                                 <input type="hidden" name="status" value="en_attente">
-                                                 <button type="submit" 
-                                                         onclick="return confirm('Êtes-vous sûr de vouloir remettre cette réservation en attente ?')"
+                                             <div x-data="{ showConfirmRemettre: false }" class="inline">
+                                                 <button type="button" 
+                                                         @click="showConfirmRemettre = true"
                                                          class="inline-flex items-center justify-center px-4 py-2 border border-yellow-300 rounded-lg text-sm font-medium text-yellow-700 bg-white hover:bg-yellow-50 transition-colors duration-200">
                                                      <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                      </svg>
                                                      Remettre en attente
                                                  </button>
-                                             </form>
+                                                 
+                                                 <!-- Modal de confirmation pour remettre en attente -->
+                                                 <div x-show="showConfirmRemettre" 
+                                                      x-transition:enter="transition ease-out duration-300"
+                                                      x-transition:enter-start="opacity-0"
+                                                      x-transition:enter-end="opacity-100"
+                                                      x-transition:leave="transition ease-in duration-200"
+                                                      x-transition:leave-start="opacity-100"
+                                                      x-transition:leave-end="opacity-0"
+                                                      class="fixed inset-0 z-50 overflow-y-auto" 
+                                                      style="display: none;">
+                                                     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                                         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showConfirmRemettre = false"></div>
+                                                         
+                                                         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                                 <div class="sm:flex sm:items-start">
+                                                                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                                         <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                         </svg>
+                                                                     </div>
+                                                                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                                                         <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                                             Remettre en attente
+                                                                         </h3>
+                                                                         <div class="mt-2">
+                                                                             <p class="text-sm text-gray-500">
+                                                                                 Êtes-vous sûr de vouloir remettre cette réservation en attente ? 
+                                                                                 L'adhérent devra attendre que le livre soit disponible.
+                                                                             </p>
+                                                                         </div>
+                                                                     </div>
+                                                                 </div>
+                                                             </div>
+                                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                                 <form action="{{ route('reservations.status', $reservation->livre->id_livre) }}" method="POST" class="inline">
+                                                                     @csrf
+                                                                     @method('PUT')
+                                                                     <input type="hidden" name="status" value="en_attente">
+                                                                     <button type="submit" 
+                                                                             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-yellow-600 text-base font-medium text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                         Confirmer
+                                                                     </button>
+                                                                 </form>
+                                                                 <button type="button" 
+                                                                         @click="showConfirmRemettre = false"
+                                                                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                     Annuler
+                                                                 </button>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
                                          @endif
                                          
                                          @if($reservation->status !== 'annulee')
                                              <!-- Bouton Annuler -->
-                                             <form action="{{ route('reservations.update', $reservation->id_reservation) }}" method="POST" class="inline">
-                                                 @csrf
-                                                 @method('PUT')
-                                                 <input type="hidden" name="status" value="annulee">
-                                                 <button type="submit" 
-                                                         onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')"
+                                             <div x-data="{ showConfirmAnnuler: false }" class="inline">
+                                                 <button type="button" 
+                                                         @click="showConfirmAnnuler = true"
                                                          class="inline-flex items-center justify-center px-4 py-2 border border-red-300 rounded-lg text-sm font-medium text-red-700 bg-white hover:bg-red-50 transition-colors duration-200">
                                                      <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                      </svg>
                                                      Annuler
                                                  </button>
-                                             </form>
+                                                 
+                                                 <!-- Modal de confirmation pour annuler -->
+                                                 <div x-show="showConfirmAnnuler" 
+                                                      x-transition:enter="transition ease-out duration-300"
+                                                      x-transition:enter-start="opacity-0"
+                                                      x-transition:enter-end="opacity-100"
+                                                      x-transition:leave="transition ease-in duration-200"
+                                                      x-transition:leave-start="opacity-100"
+                                                      x-transition:leave-end="opacity-0"
+                                                      class="fixed inset-0 z-50 overflow-y-auto" 
+                                                      style="display: none;">
+                                                     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                                         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showConfirmAnnuler = false"></div>
+                                                         
+                                                         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                                 <div class="sm:flex sm:items-start">
+                                                                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                                         <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                         </svg>
+                                                                     </div>
+                                                                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                                                         <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                                             Confirmer l'annulation
+                                                                         </h3>
+                                                                         <div class="mt-2">
+                                                                             <p class="text-sm text-gray-500">
+                                                                                 Êtes-vous sûr de vouloir annuler cette réservation ? 
+                                                                                 Cette action peut être réversible.
+                                                                             </p>
+                                                                         </div>
+                                                                     </div>
+                                                                 </div>
+                                                             </div>
+                                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                                 <form action="{{ route('reservations.status', $reservation->livre->id_livre) }}" method="POST" class="inline">
+                                                                     @csrf
+                                                                     @method('PUT')
+                                                                     <input type="hidden" name="status" value="annulee">
+                                                                     <button type="submit" 
+                                                                             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                         Confirmer
+                                                                     </button>
+                                                                 </form>
+                                                                 <button type="button" 
+                                                                         @click="showConfirmAnnuler = false"
+                                                                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                     Annuler
+                                                                 </button>
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
                                          @endif
                                          
-                                         @if($reservation->status === 'annulee')
-                                             <!-- Bouton Remettre en attente (pour réservations annulées) -->
-                                             <form action="{{ route('reservations.update', $reservation->id_reservation) }}" method="POST" class="inline">
-                                                 @csrf
-                                                 @method('PUT')
-                                                 <input type="hidden" name="status" value="en_attente">
-                                                 <button type="submit" 
-                                                         onclick="return confirm('Êtes-vous sûr de vouloir remettre cette réservation en attente ?')"
-                                                         class="inline-flex items-center justify-center px-4 py-2 border border-blue-300 rounded-lg text-sm font-medium text-blue-700 bg-white hover:bg-blue-50 transition-colors duration-200">
-                                                     <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                     </svg>
-                                                     Réactiver
-                                                 </button>
-                                             </form>
-                                         @endif
+
                                      @else
                                          <!-- Actions pour les adhérents - seulement annuler -->
                                          @if($reservation->status !== 'annulee')
                                              <!-- Bouton Annuler (changer le statut) -->
-                                             <form action="{{ route('reservations.status', $reservation->livre->id_livre) }}" method="POST" class="inline">
-                                                 @csrf
-                                                 @method('PUT')
-                                                 <input type="hidden" name="status" value="annulee">
-                                                 <button type="submit" 
-                                                         onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')"
+                                             <div x-data="{ showConfirmAnnulerAdherent: false }" class="inline">
+                                                 <button type="button" 
+                                                         @click="showConfirmAnnulerAdherent = true"
                                                          class="inline-flex items-center justify-center px-4 py-2 border border-orange-300 rounded-lg text-sm font-medium text-orange-700 bg-white hover:bg-orange-50 transition-colors duration-200">
                                                      <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                      </svg>
                                                      Annuler
                                                  </button>
-                                             </form>
-                                         @endif
-                                     @endif
-                                     
-                                     @if(Auth::user()->role === 'admin')
-                                         <!-- Bouton Supprimer pour les admins -->
-                                         <div x-data="{ showConfirmAdmin: false }" class="inline">
-                                             <button type="button" 
-                                                     @click="showConfirmAdmin = true"
-                                                     class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
-                                                 <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                 </svg>
-                                                 Supprimer
-                                             </button>
-                                             
-                                             <!-- Modal de confirmation pour admin -->
-                                             <div x-show="showConfirmAdmin" 
-                                                  x-transition:enter="transition ease-out duration-300"
-                                                  x-transition:enter-start="opacity-0"
-                                                  x-transition:enter-end="opacity-100"
-                                                  x-transition:leave="transition ease-in duration-200"
-                                                  x-transition:leave-start="opacity-100"
-                                                  x-transition:leave-end="opacity-0"
-                                                  class="fixed inset-0 z-50 overflow-y-auto" 
-                                                  style="display: none;">
-                                                 <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                                     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showConfirmAdmin = false"></div>
-                                                     
-                                                     <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                                                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                                             <div class="sm:flex sm:items-start">
-                                                                 <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                                                     <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                                                                     </svg>
-                                                                 </div>
-                                                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                                                     <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                                                         Confirmation de suppression
-                                                                     </h3>
-                                                                     <div class="mt-2">
-                                                                         <p class="text-sm text-gray-500">
-                                                                             Êtes-vous sûr de vouloir supprimer définitivement cette réservation ? Cette action est irréversible.
-                                                                         </p>
+                                                 
+                                                 <!-- Modal de confirmation pour annuler (adhérent) -->
+                                                 <div x-show="showConfirmAnnulerAdherent" 
+                                                      x-transition:enter="transition ease-out duration-300"
+                                                      x-transition:enter-start="opacity-0"
+                                                      x-transition:enter-end="opacity-100"
+                                                      x-transition:leave="transition ease-in duration-200"
+                                                      x-transition:leave-start="opacity-100"
+                                                      x-transition:leave-end="opacity-0"
+                                                      class="fixed inset-0 z-50 overflow-y-auto" 
+                                                      style="display: none;">
+                                                     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                                         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showConfirmAnnulerAdherent = false"></div>
+                                                         
+                                                         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                                 <div class="sm:flex sm:items-start">
+                                                                     <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                                         <svg class="h-6 w-6 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                         </svg>
+                                                                     </div>
+                                                                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                                                         <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                                                             Confirmer l'annulation
+                                                                         </h3>
+                                                                         <div class="mt-2">
+                                                                             <p class="text-sm text-gray-500">
+                                                                                 Êtes-vous sûr de vouloir annuler cette réservation ? 
+                                                                                 Vous pourrez la réactiver plus tard si nécessaire.
+                                                                             </p>
+                                                                         </div>
                                                                      </div>
                                                                  </div>
                                                              </div>
-                                                         </div>
-                                                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                             <form action="{{ route('reservations.destroy', $reservation->id_reservation) }}" method="POST" class="inline">
-                                                                 @csrf
-                                                                 @method('DELETE')
-                                                                 <button type="submit" 
-                                                                         class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                                                     Supprimer
+                                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                                 <form action="{{ route('reservations.status', $reservation->livre->id_livre) }}" method="POST" class="inline">
+                                                                     @csrf
+                                                                     @method('PUT')
+                                                                     <input type="hidden" name="status" value="annulee">
+                                                                     <button type="submit" 
+                                                                             class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-orange-600 text-base font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                         Confirmer
+                                                                     </button>
+                                                                 </form>
+                                                                 <button type="button" 
+                                                                         @click="showConfirmAnnulerAdherent = false"
+                                                                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                     Annuler
                                                                  </button>
-                                                             </form>
-                                                             <button type="button" 
-                                                                     @click="showConfirmAdmin = false"
-                                                                     class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                                                 Annuler
-                                                             </button>
+                                                             </div>
                                                          </div>
                                                      </div>
                                                  </div>
                                              </div>
-                                         </div>
+                                         @endif
                                      @endif
+                                     
                                  </div>
                             </div>
                         </div>
