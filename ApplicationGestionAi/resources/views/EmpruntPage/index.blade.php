@@ -78,6 +78,14 @@
                                         Gestion adherent
                                     </div>
                                 </a>
+                                <a href="{{ route('reservations.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Gestion des réservations
+                                    </div>
+                                </a>
                                 @endif
                                 
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
@@ -95,6 +103,14 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                         </svg>
                                         Mes Emprunts
+                                    </div>
+                                </a>
+                                <a href="{{ route('reservations.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Mes Réservations
                                     </div>
                                 </a>
                                 @endif
@@ -206,7 +222,7 @@
 
     <!-- Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        @if($emprunts->isEmpty())
+    @if($emprunts->isEmpty())
             <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
                 <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                     <svg class="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -223,11 +239,11 @@
                         Explorer le catalogue
                     </a>
                 </div>
-            </div>
-        @else
+        </div>
+    @else
             <!-- Table des emprunts -->
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div class="overflow-x-auto">
+        <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
                             <tr>
@@ -237,10 +253,10 @@
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date retour prévue</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date retour effectif</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Statut</th>
-                            </tr>
-                        </thead>
+                    </tr>
+                </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
-                            @foreach($emprunts as $emprunt)
+                    @foreach($emprunts as $emprunt)
                                 <tr class="hover:bg-blue-50 transition-colors duration-200">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
@@ -308,7 +324,7 @@
                                                 <span class="text-gray-400">Non définie</span>
                                             @endif
                                         </div>
-                                    </td>
+                            </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">
                                             @if($emprunt->date_retour_effectif)
@@ -320,29 +336,29 @@
                                                 <span class="text-gray-400">Non retourné</span>
                                             @endif
                                         </div>
-                                    </td>
+                            </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($emprunt->statut === 'en_cours')
+                                @if($emprunt->statut === 'en_cours')
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                                 </svg>
                                                 En cours
                                             </span>
-                                        @else
+                                @else
                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M5 13l4 4L19 7" />
                                                 </svg>
                                                 Retourné
                                             </span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
             </div>
 
             <!-- Actions -->
@@ -352,8 +368,8 @@
                     <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    Retour au catalogue
-                </a>
+            Retour au catalogue
+        </a>
             </div>
         @endif
     </div>

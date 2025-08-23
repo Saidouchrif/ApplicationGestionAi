@@ -127,4 +127,7 @@ class EmpruntController extends Controller
 
         return redirect()->back()->with('success', 'Emprunt supprimé avec succès.');
     }
+    public function chnagerstatus(Request $request,$id){
+        
+    }
 }

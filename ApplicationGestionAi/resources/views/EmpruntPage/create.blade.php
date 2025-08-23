@@ -78,6 +78,14 @@
                                         Gestion adherent
                                     </div>
                                 </a>
+                                <a href="{{ route('reservations.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Gestion des réservations
+                                    </div>
+                                </a>
                                 @endif
                                 
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
@@ -95,6 +103,14 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                         </svg>
                                         Mes Emprunts
+                                    </div>
+                                </a>
+                                <a href="{{route('reservations.index')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Mes Réservations
                                     </div>
                                 </a>
                                 @endif
@@ -221,7 +237,7 @@
 
             <!-- Form Content -->
             <div class="p-6">
-                @if ($errors->any())
+    @if ($errors->any())
                     <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                         <div class="flex items-center mb-2">
                             <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -230,80 +246,80 @@
                             <h3 class="text-lg font-semibold text-red-800">Erreurs de validation</h3>
                         </div>
                         <ul class="list-disc list-inside text-red-700 space-y-1">
-                            @foreach ($errors->all() as $error)
+                @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
                 <form action="{{ route('emprunts.store') }}" method="POST" class="space-y-6">
-                    @csrf
+        @csrf
 
-                    <!-- Livre (affiché mais non modifiable) -->
+        <!-- Livre (affiché mais non modifiable) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
+        <div>
                             <label for="id_livre_display" class="block text-sm font-semibold text-gray-700 mb-2">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                 </svg>
                                 Livre sélectionné
                             </label>
-                            <input type="text" 
-                                   id="id_livre_display"
+            <input type="text" 
+                   id="id_livre_display"
                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 text-gray-700 cursor-not-allowed focus:outline-none"
-                                   value="{{ $livre->titre }}"
-                                   disabled>
-                            <!-- Champ caché envoyé -->
-                            <input type="hidden" name="id_livre" value="{{ $livre->id_livre }}">
-                        </div>
+                   value="{{ $livre->titre }}"
+                   disabled>
+            <!-- Champ caché envoyé -->
+            <input type="hidden" name="id_livre" value="{{ $livre->id_livre }}">
+        </div>
 
-                        <!-- Date d'emprunt (affichée mais non modifiable) -->
-                        <div>
+        <!-- Date d'emprunt (affichée mais non modifiable) -->
+        <div>
                             <label for="date_emprunt_display" class="block text-sm font-semibold text-gray-700 mb-2">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 Date d'emprunt
                             </label>
-                            <input type="text" 
-                                   id="date_emprunt_display"
+            <input type="text" 
+                   id="date_emprunt_display"
                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 text-gray-700 cursor-not-allowed focus:outline-none"
                                    value="{{ date('d/m/Y') }}"
-                                   disabled>
-                            <!-- Champ caché envoyé -->
-                            <input type="hidden" name="date_emprunt" value="{{ date('Y-m-d') }}">
+                   disabled>
+            <!-- Champ caché envoyé -->
+            <input type="hidden" name="date_emprunt" value="{{ date('Y-m-d') }}">
                         </div>
-                    </div>
+        </div>
 
                     <!-- Dates de retour -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Date retour prévue -->
-                        <div>
+        <div>
                             <label for="date_retour_prevue" class="block text-sm font-semibold text-gray-700 mb-2">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 Date de retour prévue
                             </label>
-                            <input type="date" 
-                                   name="date_retour_prevue" 
-                                   id="date_retour_prevue" 
+            <input type="date" 
+                   name="date_retour_prevue" 
+                   id="date_retour_prevue" 
                                    min="{{ date('Y-m-d') }}"
                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
-                        </div>
+        </div>
 
-                        <!-- Date retour effectif -->
-                        <div>
+        <!-- Date retour effectif -->
+        <div>
                             <label for="date_retour_effectif" class="block text-sm font-semibold text-gray-700 mb-2">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 Date de retour effectif
                             </label>
-                            <input type="date" 
-                                   name="date_retour_effectif" 
-                                   id="date_retour_effectif" 
+            <input type="date" 
+                   name="date_retour_effectif" 
+                   id="date_retour_effectif" 
                                    min="{{ date('Y-m-d') }}"
                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
                         </div>
@@ -322,11 +338,11 @@
                             <li>• Vous pouvez modifier la date de retour effectif plus tard</li>
                             <li>• Le statut sera automatiquement défini sur "En cours"</li>
                         </ul>
-                    </div>
+        </div>
 
-                    <!-- Champs cachés : utilisateur et statut -->
-                    <input type="hidden" name="id_adherent" value="{{ Auth::id() }}">
-                    <input type="hidden" name="statut" value="en_cours">
+        <!-- Champs cachés : utilisateur et statut -->
+        <input type="hidden" name="id_adherent" value="{{ Auth::id() }}">
+        <input type="hidden" name="statut" value="en_cours">
 
                     <!-- Action Buttons -->
                     <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
@@ -335,15 +351,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                             </svg>
                             Confirmer l'emprunt
-                        </button>
+            </button>
                         <a href="{{ route('livres.index') }}" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200 text-center">
                             <svg class="w-5 h-5 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             Retour au catalogue
-                        </a>
-                    </div>
-                </form>
+            </a>
+        </div>
+    </form>
             </div>
         </div>
     </div>

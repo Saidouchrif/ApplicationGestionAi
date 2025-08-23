@@ -20,13 +20,13 @@ class ReservationController extends Controller
             return redirect()->route('login')->with('error', 'Vous devez être connecté pour voir vos réservations.');
         }
 
-        // Récupérer les réservations de l'utilisateur connecté
+        // Récupérer les réservations de l'utilisateur connecté avec pagination
         $reservations = Reservation::where('id_adherent', Auth::id())
             ->with(['livre', 'adherent'])
             ->orderBy('date_reservation', 'desc')
-            ->get();
+            ->paginate(10);
 
-        return view('reservations.index', compact('reservations'));
+        return view('ReservationPage.index', compact('reservations'));
     }
 
     /**
@@ -42,12 +42,12 @@ class ReservationController extends Controller
         // Si un ID de livre est fourni, récupérer le livre
         if ($id_livre) {
             $livre = Livre::findOrFail($id_livre);
-            return view('reservations.create', compact('livre'));
+            return view('ReservationPage.create', compact('livre'));
         }
 
         // Sinon, afficher la liste des livres disponibles pour réservation
         $livres = Livre::where('stock', 0)->get();
-        return view('reservations.create', compact('livres'));
+        return view('ReservationPage.create', compact('livres'));
     }
 
     /**
@@ -95,7 +95,7 @@ class ReservationController extends Controller
             'status' => 'en_attente',
         ]);
 
-        return redirect()->back()->with('success', 'Réservation créée avec succès ! Vous serez notifié quand le livre sera disponible.');
+        return to_route('livres.index')->with('success', 'Réservation créée avec succès ! Vous serez notifié quand le livre sera disponible.');
     }
 
     /**
@@ -148,7 +148,7 @@ class ReservationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Reservation $reservation)
+    public function destroy(Reservation $reservation,$id)
     {
         // Vérifier que l'utilisateur est connecté
         if (!Auth::check()) {
@@ -164,5 +164,54 @@ class ReservationController extends Controller
         $reservation->delete();
 
         return redirect()->back()->with('success', 'Réservation annulée avec succès.');
+    }
+    public function chnagestatus(Request $request, $id_livre)
+    {
+        // Validation des données
+        $request->validate([
+            'status' => 'required|in:en_attente,confirmee,annulee',
+        ], [
+            'status.required' => 'Le statut est requis.',
+            'status.in' => 'Le statut doit être en_attente, confirmee ou annulee.',
+        ]);
+
+        // Vérifier que l'utilisateur est connecté
+        if (!Auth::check()) {
+            return redirect()->back()->with('error', 'Vous devez être connecté pour modifier une réservation.');
+        }
+
+        // Trouver la réservation pour ce livre et cet utilisateur
+        $reservation = Reservation::where('id_livre', $id_livre)
+            ->where('id_adherent', Auth::id())
+            ->first();
+
+        if (!$reservation) {
+            return redirect()->back()->with('error', 'Réservation non trouvée.');
+        }
+
+        // Vérifier que l'utilisateur peut modifier cette réservation (propriétaire ou admin)
+        if ($reservation->id_adherent !== Auth::id() && Auth::user()->role !== 'admin') {
+            return redirect()->back()->with('error', 'Vous n\'êtes pas autorisé à modifier cette réservation.');
+        }
+
+        // Mettre à jour la réservation
+        $reservation->update([
+            'status' => $request->status,
+        ]);
+
+        $statusMessage = '';
+        switch ($request->status) {
+            case 'annulee':
+                $statusMessage = 'Réservation annulée avec succès.';
+                break;
+            case 'confirmee':
+                $statusMessage = 'Réservation confirmée avec succès.';
+                break;
+            case 'en_attente':
+                $statusMessage = 'Réservation remise en attente avec succès.';
+                break;
+        }
+
+        return redirect()->back()->with('success', $statusMessage);
     }
 }

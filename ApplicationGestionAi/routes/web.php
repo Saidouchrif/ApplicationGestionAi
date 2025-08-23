@@ -92,6 +92,7 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin')
         ->name('dashboard');
 });
+Route::put('/emprunts/update/status/{id}', [EmpruntController::class, 'chnagerstatus'])->name('emprunts.status')->middleware('auth');
 Route::get('/emprunts/create/{id_livre}', [EmpruntController::class, 'create'])->name('emprunts.create')->middleware('auth');
 Route::post('/emprunts/store', [EmpruntController::class, 'store'])->name('emprunts.store')->middleware('auth');
 Route::get('/emprunts', [EmpruntController::class, 'index'])->name('emprunts.index')->middleware('auth');
@@ -107,5 +108,10 @@ Route::post('/books/store', [LivreController::class, 'store'])->name('livres.sto
 Route::get('/Books/edit/{id}', [LivreController::class, 'edit'])->name('livres.edit');
 Route::put('/Books/update/{id}', [LivreController::class, 'update'])->name('livres.update');
 Route::delete('/Books/delete/{id}', [LivreController::class, 'destroy'])->name('livres.destroy');
+Route::get('/reservation/index',[ReservationController::class,'index'])->name('reservations.index');
 Route::get('/reservation/create/{id_livre}',[ReservationController::class,'create'])->name('reservation.create');
-Route::post('/reservation/store',[ReservationController::class,'store'])->name('reservation.store');
+Route::post('/reservation/store',[ReservationController::class,'store'])->name('reservations.store');
+Route::get('/reservation/edit/{id}',[ReservationController::class,'edit'])->name('reservations.edit');
+Route::put('/reservation/update/{id}',[ReservationController::class,'update'])->name('reservations.update');
+Route::delete('/reservation/delete/{id}',[ReservationController::class,'destroy'])->name('reservations.destroy');
+Route::put('/reservation/update/chnagestatus/{id_livre}',[ReservationController::class,'chnagestatus'])->name('reservations.status');

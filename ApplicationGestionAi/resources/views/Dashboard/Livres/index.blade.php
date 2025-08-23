@@ -78,6 +78,14 @@
                                         Gestion adherent
                                     </div>
                                 </a>
+                                <a href="{{ route('reservations.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Gestion des réservations
+                                    </div>
+                                </a>
                                 @endif
                                 
                                 <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
@@ -95,6 +103,14 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                         </svg>
                                         Mes Emprunts
+                                    </div>
+                                </a>
+                                <a href="{{ route('reservations.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Mes Réservations
                                     </div>
                                 </a>
                                 @endif
@@ -218,14 +234,14 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
-                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Rechercher un livre..."
+                <input type="text" name="q" value="{{ request('q') }}" placeholder="Rechercher un livre..."
                                class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all duration-200">
                     </div>
-                </form>
+            </form>
 
                 <!-- Boutons d'action -->
                 <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                    <a href="{{ route('livres.create') }}"
+                <a href="{{ route('livres.create') }}"
                        class="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
                         <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -233,7 +249,7 @@
                         Ajouter un Livre
                     </a>
 
-                    <a href="{{ route('home') }}" 
+                <a href="{{ route('home') }}" 
                        class="inline-flex items-center justify-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-medium transition-all duration-200 shadow-md">
                         <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -257,7 +273,7 @@
         @else
             <!-- Table CRUD -->
             <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                <div class="overflow-x-auto">
+            <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
                             <tr>
@@ -269,10 +285,10 @@
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prix</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Rating</th>
                                 <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
+                        </tr>
+                    </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
-                            @foreach($livres as $livre)
+                        @foreach($livres as $livre)
                                 <tr class="hover:bg-blue-50 transition-colors duration-200">
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                         #{{ $livre->id_livre }}
@@ -286,7 +302,7 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($livre->image_url)
+                                    @if($livre->image_url)
                                             @if(filter_var($livre->image_url, FILTER_VALIDATE_URL))
                                                 <!-- Image externe (URL) -->
                                                 <img src="{{ $livre->image_url }}" 
@@ -298,64 +314,64 @@
                                                      class="h-12 w-12 rounded-lg object-cover border-2 border-gray-200 shadow-sm"
                                                      alt="Image du livre">
                                             @endif
-                                        @else
+                                    @else
                                             <div class="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
                                                 <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                 </svg>
                                             </div>
-                                        @endif
-                                    </td>
+                                    @endif
+                                </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($livre->stock > 0)
+                                    @if($livre->stock > 0)
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 {{ $livre->stock }} disponible
                                             </span>
-                                        @else
+                                    @else
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                 Épuisé
                                             </span>
-                                        @endif
-                                    </td>
+                                    @endif
+                                </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                                        {{ number_format($livre->price, 2, ',', ' ') }} MAD
-                                    </td>
+                                    {{ number_format($livre->price, 2, ',', ' ') }} MAD
+                                </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <span class="text-yellow-500 mr-1">⭐</span>
                                             <span class="text-sm font-medium text-gray-900">{{ $livre->rating }}/5</span>
                                         </div>
-                                    </td>
+                                </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
                                         <div class="flex justify-center space-x-2">
-                                            <a href="{{ route('livres.show', $livre->id_livre) }}"
+                                    <a href="{{ route('livres.show', $livre->id_livre) }}"
                                                class="inline-flex items-center px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-xs font-medium transition-colors duration-200">
                                                 <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                                 Voir
-                                            </a>
-                                            <a href="{{route('livres.edit',$livre->id_livre)}}"
+                                    </a>
+                                    <a href="{{route('livres.edit',$livre->id_livre)}}"
                                                class="inline-flex items-center px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 rounded-lg text-xs font-medium transition-colors duration-200">
                                                 <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                                 </svg>
                                                 Modifier
-                                            </a>
-                                            <button onclick="openModal({{ $livre->id_livre }})"
+                                    </a>
+                                    <button onclick="openModal({{ $livre->id_livre }})"
                                                     class="inline-flex items-center px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-800 rounded-lg text-xs font-medium transition-colors duration-200">
                                                 <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                                 Supprimer
-                                            </button>
+                                    </button>
                                         </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
                 </div>
             </div>
 
