@@ -285,49 +285,90 @@
 
     <!-- Section Livres similaires -->
     <div class="max-w-7xl mx-auto px-6 py-12">
-        <h3 class="text-2xl font-bold text-gray-900 mb-6">📌 Livres similaires</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            @foreach($similaires ?? [] as $similar)
-                <a href="{{ route('livres.show', $similar->id_livre) }}"
-                   class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transform hover:scale-105 transition duration-300">
-                   <div class="relative">
-                       @if($similar->image_url)
-                           @if(filter_var($similar->image_url, FILTER_VALIDATE_URL))
-                               <!-- Image externe (URL) -->
-                               <img src="{{ $similar->image_url }}" 
-                                    alt="{{ $similar->titre }}"
-                                    class="w-full h-56 object-cover">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">
+            🤖 Livres recommandés par IA
+            @if(isset($recommendations) && count($recommendations) > 0)
+                <span class="text-sm font-normal text-gray-500 ml-2">(basé sur la similarité du contenu)</span>
+            @endif
+        </h3>
+        
+        @if(isset($recommendations) && count($recommendations) > 0)
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach($recommendations as $rec)
+                    <a href="{{ route('livres.show', $rec['id_livre']) }}"
+                       class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transform hover:scale-105 transition duration-300">
+                       <div class="relative">
+                           @if($rec['image_url'])
+                               @if(filter_var($rec['image_url'], FILTER_VALIDATE_URL))
+                                   <!-- Image externe (URL) -->
+                                   <img src="{{ $rec['image_url'] }}" 
+                                        alt="{{ $rec['titre'] }}"
+                                        class="w-full h-56 object-cover">
+                               @else
+                                   <!-- Image uploadée localement -->
+                                   <img src="{{ asset('storage/'.$rec['image_url']) }}" 
+                                        alt="{{ $rec['titre'] }}"
+                                        class="w-full h-56 object-cover">
+                               @endif
                            @else
-                               <!-- Image uploadée localement -->
-                               <img src="{{ asset('storage/'.$similar->image_url) }}" 
-                                    alt="{{ $similar->titre }}"
+                               <!-- Image par défaut -->
+                               <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=698&q=80" 
+                                    alt="Image par défaut"
                                     class="w-full h-56 object-cover">
                            @endif
-                       @else
-                           <!-- Image par défaut -->
-                           <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=698&q=80" 
-                                alt="Image par défaut"
-                                class="w-full h-56 object-cover">
-                       @endif
-                       
-                       <!-- Prix sur l'image -->
-                       @if(!is_null($similar->price) && $similar->price > 0)
-                           <div class="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
-                               💰 {{ number_format((float)$similar->price, 2) }} (MAD)
-                           </div>
-                       @elseif(!is_null($similar->price) && $similar->price == 0)
-                           <div class="absolute bottom-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
-                               🆓 Gratuit
-                           </div>
-                       @endif
-                   </div>
-                    <div class="p-4">
-                        <h4 class="text-lg font-semibold text-gray-900 truncate">{{ $similar->titre }}</h4>
-                        <p class="text-sm text-gray-600">{{ $similar->auteur ?? 'Auteur inconnu' }}</p>
-                    </div>
-                </a>
-            @endforeach
-        </div>
+                           
+                           <!-- Score de similarité -->
+                           @if(isset($rec['similarity_score']))
+                               <div class="absolute top-2 right-2 bg-indigo-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                                   {{ number_format($rec['similarity_score'] * 100, 1) }}% similaire
+                               </div>
+                           @endif
+                           
+                           <!-- Prix sur l'image -->
+                           @if(!is_null($rec['price']) && $rec['price'] > 0)
+                               <div class="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                                   💰 {{ number_format((float)$rec['price'], 2) }} (MAD)
+                               </div>
+                           @elseif(!is_null($rec['price']) && $rec['price'] == 0)
+                               <div class="absolute bottom-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-semibold shadow-lg">
+                                   🆓 Gratuit
+                               </div>
+                           @endif
+                       </div>
+                        <div class="p-4">
+                            <h4 class="text-lg font-semibold text-gray-900 truncate">{{ $rec['titre'] }}</h4>
+                            <p class="text-sm text-gray-600 mb-2">{{ Str::limit($rec['description'], 80) }}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">Stock: {{ $rec['stock'] }}</span>
+                                <div class="flex items-center">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $rec['rating'])
+                                            <svg class="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        @else
+                                            <svg class="w-3 h-3 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        @endif
+                                    @endfor
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        @else
+            <div class="text-center py-8">
+                <div class="text-gray-400 mb-4">
+                    <svg class="w-16 h-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <p class="text-gray-500">Aucune recommandation disponible pour le moment.</p>
+                <p class="text-sm text-gray-400 mt-2">Le système de recommandation IA est en cours de chargement...</p>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

@@ -230,6 +230,133 @@
         </div>
     </div>
 
+    <!-- Section Recommandations IA Personnalisées -->
+    <div class="bg-gradient-to-br from-indigo-50 to-blue-100 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-3">
+                    🤖 Besoin d'aide pour choisir votre prochain livre ?
+                </h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Dites-nous quels livres vous avez aimés et notre IA vous proposera des recommandations personnalisées.
+                </p>
+            </div>
+
+            <!-- Formulaire de recommandations -->
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <form id="personalRecommendationForm" class="space-y-4">
+                        @csrf
+                        
+                        <!-- Container des livres -->
+                        <div id="booksContainer" class="space-y-4">
+                            <!-- Premier livre (toujours présent) -->
+                            <div class="book-entry bg-gray-50 rounded-xl p-4 border-2 border-dashed border-gray-200">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="text-lg font-semibold text-gray-900">Livre #1</h3>
+                                    <button type="button" class="text-red-500 hover:text-red-700" onclick="removeBook(this)" style="display: none;">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Titre du livre *
+                                        </label>
+                                        <input type="text" name="books[0][title]" required
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                                               placeholder="Ex: Le Petit Prince">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Description ou résumé *
+                                        </label>
+                                        <textarea name="books[0][description]" required rows="2"
+                                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none"
+                                                  placeholder="Décrivez brièvement l'histoire, le genre, les thèmes..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bouton Ajouter un livre -->
+                        <div class="text-center">
+                            <button type="button" onclick="addBook()" 
+                                    class="inline-flex items-center px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Ajouter un autre livre
+                            </button>
+                        </div>
+
+                        <!-- Bouton Soumettre -->
+                        <div class="text-center pt-4">
+                            <button type="submit" id="submitBtn"
+                                    class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-semibold">
+                                <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                </svg>
+                                Obtenir mes recommandations
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Section de chargement -->
+                <div id="loadingSection" class="hidden bg-white rounded-2xl shadow-xl p-6 text-center mt-6">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-3"></div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Analyse en cours...</h3>
+                    <p class="text-gray-600">Notre IA analyse vos préférences pour trouver les meilleures recommandations.</p>
+                </div>
+
+                <!-- Section des résultats -->
+                <div id="resultsSection" class="hidden mt-6">
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <div class="text-center mb-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">🎯 Vos recommandations personnalisées</h3>
+                            <p class="text-gray-600">Basé sur vos préférences, voici ce que nous vous suggérons :</p>
+                        </div>
+
+                        <div id="recommendationsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Les recommandations seront insérées ici -->
+                        </div>
+
+                        <div class="text-center mt-6">
+                            <button onclick="resetForm()" 
+                                    class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Nouvelle recherche
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section d'erreur -->
+                <div id="errorSection" class="hidden bg-red-50 border border-red-200 rounded-2xl p-6 text-center mt-6">
+                    <div class="text-red-600 mb-3">
+                        <svg class="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-red-900 mb-2">Erreur</h3>
+                    <p id="errorMessage" class="text-red-700 mb-3"></p>
+                    <button onclick="resetForm()" 
+                            class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Réessayer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Search (optionnel) -->
         <div class="mb-6">
@@ -432,6 +559,268 @@
          </div>
      </footer>
  </div>
+
+ <!-- JavaScript pour les recommandations personnalisées -->
+ <script>
+ let bookCount = 1;
+
+ function addBook() {
+     bookCount++;
+     const container = document.getElementById('booksContainer');
+     const newBookEntry = document.createElement('div');
+     newBookEntry.className = 'book-entry bg-gray-50 rounded-xl p-6 border-2 border-dashed border-gray-200';
+     newBookEntry.innerHTML = `
+         <div class="flex items-center justify-between mb-4">
+             <h3 class="text-lg font-semibold text-gray-900">Livre #${bookCount}</h3>
+             <button type="button" class="text-red-500 hover:text-red-700" onclick="removeBook(this)">
+                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                 </svg>
+             </button>
+         </div>
+         
+         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div>
+                 <label class="block text-sm font-medium text-gray-700 mb-2">
+                     Titre du livre *
+                 </label>
+                 <input type="text" name="books[${bookCount-1}][title]" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                        placeholder="Ex: Le Petit Prince">
+             </div>
+             
+             <div>
+                 <label class="block text-sm font-medium text-gray-700 mb-2">
+                     Description ou résumé *
+                 </label>
+                 <textarea name="books[${bookCount-1}][description]" required rows="3"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors resize-none"
+                           placeholder="Décrivez brièvement l'histoire, le genre, les thèmes..."></textarea>
+             </div>
+         </div>
+     `;
+     container.appendChild(newBookEntry);
+     
+     // Afficher le bouton de suppression pour le premier livre s'il y en a plus d'un
+     if (bookCount > 1) {
+         const firstRemoveBtn = container.querySelector('.book-entry:first-child button[onclick="removeBook(this)"]');
+         if (firstRemoveBtn) {
+             firstRemoveBtn.style.display = 'block';
+         }
+     }
+ }
+
+ function removeBook(button) {
+     const bookEntry = button.closest('.book-entry');
+     bookEntry.remove();
+     bookCount--;
+     
+     // Mettre à jour les numéros des livres
+     const bookEntries = document.querySelectorAll('.book-entry');
+     bookEntries.forEach((entry, index) => {
+         const title = entry.querySelector('h3');
+         title.textContent = `Livre #${index + 1}`;
+         
+         // Mettre à jour les noms des champs
+         const inputs = entry.querySelectorAll('input, textarea');
+         inputs.forEach(input => {
+             const fieldName = input.name.split('[')[2].split(']')[0];
+             input.name = `books[${index}][${fieldName}]`;
+         });
+     });
+     
+     // Masquer le bouton de suppression du premier livre s'il n'y en a qu'un
+     if (bookCount === 1) {
+         const firstRemoveBtn = document.querySelector('.book-entry:first-child button[onclick="removeBook(this)"]');
+         if (firstRemoveBtn) {
+             firstRemoveBtn.style.display = 'none';
+         }
+     }
+ }
+
+ function resetForm() {
+     // Réinitialiser le formulaire
+     document.getElementById('personalRecommendationForm').reset();
+     
+     // Supprimer tous les livres sauf le premier
+     const container = document.getElementById('booksContainer');
+     const bookEntries = container.querySelectorAll('.book-entry');
+     for (let i = 1; i < bookEntries.length; i++) {
+         bookEntries[i].remove();
+     }
+     
+     // Réinitialiser le compteur
+     bookCount = 1;
+     
+     // Masquer les sections de résultats et d'erreur
+     document.getElementById('resultsSection').classList.add('hidden');
+     document.getElementById('errorSection').classList.add('hidden');
+     document.getElementById('loadingSection').classList.add('hidden');
+     
+     // Afficher le formulaire
+     document.querySelector('.bg-white.rounded-2xl.shadow-xl.p-6').style.display = 'block';
+ }
+
+ // Gestionnaire de soumission du formulaire
+ document.getElementById('personalRecommendationForm').addEventListener('submit', async function(e) {
+     e.preventDefault();
+     
+     // Masquer les sections précédentes
+     document.getElementById('resultsSection').classList.add('hidden');
+     document.getElementById('errorSection').classList.add('hidden');
+     
+     // Afficher le chargement
+     document.getElementById('loadingSection').classList.remove('hidden');
+     
+     // Récupérer les données du formulaire
+     const formData = new FormData(this);
+     const books = [];
+     
+     // Parcourir les entrées du formulaire pour construire le tableau des livres
+     for (let i = 0; i < bookCount; i++) {
+         const title = formData.get(`books[${i}][title]`);
+         const description = formData.get(`books[${i}][description]`);
+         
+         if (title && description) {
+             books.push({
+                 title: title,
+                 description: description
+             });
+         }
+     }
+     
+     if (books.length === 0) {
+         showError('Veuillez saisir au moins un livre avec son titre et sa description.');
+         return;
+     }
+     
+     try {
+         // Envoyer la requête à Laravel
+         const response = await fetch('{{ route("recommendations.personal.submit") }}', {
+             method: 'POST',
+             headers: {
+                 'Content-Type': 'application/json',
+                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+             },
+             body: JSON.stringify({ books: books })
+         });
+         
+         const data = await response.json();
+         
+         // Masquer le chargement
+         document.getElementById('loadingSection').classList.add('hidden');
+         
+         if (data.success) {
+             displayRecommendations(data.recommendations);
+         } else {
+             showError(data.message || 'Erreur lors de la génération des recommandations');
+         }
+         
+     } catch (error) {
+         console.error('Erreur:', error);
+         document.getElementById('loadingSection').classList.add('hidden');
+         showError('Erreur de connexion. Veuillez réessayer.');
+     }
+ });
+
+ function displayRecommendations(recommendations) {
+     const grid = document.getElementById('recommendationsGrid');
+     grid.innerHTML = '';
+     
+     if (recommendations.length === 0) {
+         grid.innerHTML = `
+             <div class="col-span-full text-center py-8">
+                 <div class="text-gray-500 mb-4">
+                     <svg class="w-16 h-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
+                     </svg>
+                 </div>
+                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Aucune recommandation trouvée</h3>
+                 <p class="text-gray-600">Essayez avec d'autres livres ou descriptions plus détaillées.</p>
+             </div>
+         `;
+     } else {
+         recommendations.forEach(book => {
+             const similarityPercent = Math.round(book.similarity_score * 100);
+             const card = document.createElement('div');
+             card.className = 'bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300';
+             card.innerHTML = `
+                 <div class="relative">
+                     <img src="${book.image_url || '/images/default-book.jpg'}" 
+                          alt="${book.titre}" 
+                          class="w-full h-48 object-cover"
+                          onerror="this.src='/images/default-book.jpg'">
+                     
+                     <!-- Badge de similarité -->
+                     <div class="absolute top-2 right-2 bg-indigo-600 text-white px-2 py-1 rounded-lg text-xs font-semibold">
+                         ${similarityPercent}% similaire
+                     </div>
+                     
+                     <!-- Badge de disponibilité -->
+                     <div class="absolute bottom-2 left-2 ${book.stock > 0 ? 'bg-green-500' : 'bg-orange-500'} text-white px-2 py-1 rounded-lg text-xs font-semibold">
+                         ${book.stock > 0 ? 'Disponible' : 'Stock épuisé'}
+                     </div>
+                 </div>
+                 
+                 <div class="p-4">
+                     <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">${book.titre}</h3>
+                     <p class="text-sm text-gray-600 mb-3 line-clamp-3">${book.description}</p>
+                     
+                     <div class="flex justify-between items-center mb-3">
+                         <div class="flex items-center">
+                             <span class="text-yellow-500">★</span>
+                             <span class="text-sm text-gray-600 ml-1">${book.rating}/5</span>
+                         </div>
+                         ${book.price > 0 ? `<span class="text-green-600 font-semibold">${book.price} MAD</span>` : '<span class="text-blue-600 font-semibold">Gratuit</span>'}
+                     </div>
+                     
+                     <div class="flex space-x-2">
+                         <a href="/livres/${book.id_livre}" 
+                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-3 rounded-lg text-sm transition-colors">
+                             Détails
+                         </a>
+                         ${book.stock > 0 ? 
+                             `<a href="/emprunts/create/${book.id_livre}" 
+                                 class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 px-3 rounded-lg text-sm transition-colors">
+                                 Emprunter
+                             </a>` : 
+                             `<a href="/reservation/create/${book.id_livre}" 
+                                 class="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-center py-2 px-3 rounded-lg text-sm transition-colors">
+                                 Réserver
+                             </a>`
+                         }
+                     </div>
+                 </div>
+             `;
+             grid.appendChild(card);
+         });
+     }
+     
+     // Afficher la section des résultats
+     document.getElementById('resultsSection').classList.remove('hidden');
+ }
+
+ function showError(message) {
+     document.getElementById('errorMessage').textContent = message;
+     document.getElementById('errorSection').classList.remove('hidden');
+ }
+ </script>
+
+ <style>
+ .line-clamp-2 {
+     display: -webkit-box;
+     -webkit-line-clamp: 2;
+     -webkit-box-orient: vertical;
+     overflow: hidden;
+ }
+
+ .line-clamp-3 {
+     display: -webkit-box;
+     -webkit-line-clamp: 3;
+     -webkit-box-orient: vertical;
+     overflow: hidden;
+ }
+ </style>
  @endsection
 
 

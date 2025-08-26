@@ -8,6 +8,8 @@ use App\Http\Controllers\EmpruntController;
 use App\Http\Controllers\LivreController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\PersonalRecommendationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -115,3 +117,25 @@ Route::get('/reservation/edit/{id}',[ReservationController::class,'edit'])->name
 Route::put('/reservation/update/{id}',[ReservationController::class,'update'])->name('reservations.update');
 Route::delete('/reservation/delete/{id}',[ReservationController::class,'destroy'])->name('reservations.destroy');
 Route::put('/reservation/update/chnagestatus/{id_livre}',[ReservationController::class,'chnagestatus'])->name('reservations.status');
+
+// Routes pour les recommandations
+Route::prefix('recommendations')->group(function () {
+    // Vérifier l'état de l'API de recommandation
+    Route::get('/health', [RecommendationController::class, 'checkApiHealth'])->name('recommendations.health');
+    
+    // Obtenir les recommandations pour un livre spécifique
+    Route::get('/book/{bookId}', [RecommendationController::class, 'getRecommendations'])->name('recommendations.book');
+    
+    // Obtenir les recommandations populaires
+    Route::get('/popular', [RecommendationController::class, 'getPopularRecommendations'])->name('recommendations.popular');
+    
+    // Obtenir les recommandations personnalisées pour l'utilisateur connecté
+    Route::get('/user', [RecommendationController::class, 'getUserRecommendations'])->middleware('auth')->name('recommendations.user');
+    
+    // Obtenir un livre avec ses recommandations
+    Route::get('/book/{bookId}/with-recommendations', [RecommendationController::class, 'getBookWithRecommendations'])->name('recommendations.book.with');
+    
+    // Recommandations personnalisées basées sur les livres saisis
+    Route::get('/personal', [PersonalRecommendationController::class, 'showForm'])->name('recommendations.personal');
+    Route::post('/personal', [PersonalRecommendationController::class, 'getRecommendations'])->name('recommendations.personal.submit');
+});

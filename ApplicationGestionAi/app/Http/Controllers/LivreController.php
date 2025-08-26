@@ -57,28 +57,40 @@ class LivreController extends Controller
      */
     public function show(Request $request, $id_livre)
     {
-    // Récupérer le livre
-    $livre = Livre::findOrFail($id_livre);
+        // Récupérer le livre
+        $livre = Livre::findOrFail($id_livre);
 
-    // Recherche interne si paramètre q est présent (rare dans show mais je garde ton code)
-    if ($search = $request->query('q')) {
-        $livre = Livre::where(function ($q) use ($search) {
-                $q->where('titre', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhere('auteur', 'like', "%{$search}%");
-            })->first();
-    }
+        // Recherche interne si paramètre q est présent (rare dans show mais je garde ton code)
+        if ($search = $request->query('q')) {
+            $livre = Livre::where(function ($q) use ($search) {
+                    $q->where('titre', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%")
+                      ->orWhere('auteur', 'like', "%{$search}%");
+                })->first();
+        }
 
-    // 🔥 Livres similaires (même auteur si dispo, sinon juste d'autres livres au hasard)
-    $similaires = Livre::where('id_livre', '!=', $livre->id_livre)
-        ->when($livre->auteur, function ($query) use ($livre) {
-            $query->where('auteur', $livre->auteur);
-        })
-        ->inRandomOrder()
-        ->take(4)
-        ->get();
+        // 🔥 Livres similaires avec l'API de recommandation
+        $recommendations = [];
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->get(url('/recommendations/book/' . $id_livre . '/with-recommendations'));
+            
+            if ($response->successful()) {
+                $data = $response->json();
+                $recommendations = $data['recommendations'] ?? [];
+            }
+        } catch (\Exception $e) {
+            // En cas d'erreur, utiliser les livres similaires basiques
+            $recommendations = Livre::where('id_livre', '!=', $livre->id_livre)
+                ->when($livre->auteur ?? false, function ($query) use ($livre) {
+                    $query->where('auteur', $livre->auteur);
+                })
+                ->inRandomOrder()
+                ->take(4)
+                ->get()
+                ->toArray();
+        }
 
-    return view('PageLivres.details', compact('livre', 'similaires'));
+        return view('PageLivres.details', compact('livre', 'recommendations'));
     }
 
 
